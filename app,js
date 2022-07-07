@@ -1,0 +1,84 @@
+class WordAssociationGame {
+    $scoreDisplay;
+    $questionDisplay;
+    score = 0;
+
+    questions = [
+        {
+            quiz: ['value', 'estimate', 'evaluate'],
+            options: ['jury', 'assess'],
+            correct: 2
+        },
+        {
+            quiz: ['close', 'near', 'next'],
+            options: ['trace', 'assess'],
+            correct: 2
+        },
+        {
+            quiz: ['foreign', 'national', 'weather'],
+            options: ['forecast', 'sostainable'],
+            correct: 1
+        },
+    ];
+        
+    init() {       
+        this.$scoreDisplay = document.getElementById("score-display");
+        this.$questionDisplay = document.getElementById("question-display");
+        this.updateScore();
+        this.populateQuestion();
+        this.bindEvents();
+    }
+
+    bindEvents() {
+    }
+
+    updateScore() {
+        this.$scoreDisplay.textContent = this.score;
+    }
+
+    populateQuestion() {
+        this.questions.forEach(question => {
+            const questionBox = document.createElement('div');
+            questionBox.classList.add('question-box');
+
+            const logoDisplay = document.createElement("h3");
+            logoDisplay.textContent = "⭐";
+            questionBox.append(logoDisplay);
+
+            question.quiz.forEach(tip => {
+                const tipText = document.createElement('p'); 
+                tipText.textContent = tip;
+                questionBox.append(tipText);
+            });
+
+            const questionButtons = document.createElement('div');
+            questionButtons.classList.add('question-buttons');
+            questionBox.append(questionButtons);
+
+            question.options.forEach(option => {
+                const questionButton = document.createElement('button');
+                questionButton.classList.add('question-button');
+                questionButton.textContent = option;
+
+                questionButtons.append(questionButton);
+            });
+
+            this.$questionDisplay.append(questionBox);
+        });
+    }
+
+}
+
+const wordAssociationGame = new WordAssociationGame(); 
+
+if (
+    document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+    wordAssociationGame.init();
+
+} else {
+    document.addEventListener("DOMContentLoaded", () => {
+        wordAssociationGame.init();
+    });
+}
