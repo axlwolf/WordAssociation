@@ -1,8 +1,8 @@
 class WordAssociationGame {
     $scoreDisplay;
     $questionDisplay;
+    $questionButtonsContainer = [];
     score = 0;
-
     questions = [
         {
             quiz: ['value', 'estimate', 'evaluate'],
@@ -11,7 +11,7 @@ class WordAssociationGame {
         },
         {
             quiz: ['close', 'near', 'next'],
-            options: ['trace', 'assess'],
+            options: ['trace', 'adjacent'],
             correct: 2
         },
         {
@@ -20,6 +20,7 @@ class WordAssociationGame {
             correct: 1
         },
     ];
+    clickedOptions = [];
         
     init() {       
         this.$scoreDisplay = document.getElementById("score-display");
@@ -30,6 +31,9 @@ class WordAssociationGame {
     }
 
     bindEvents() {
+        this.$questionButtonsContainer.forEach((questionButtonsContainer, questionIndex) => {
+            questionButtonsContainer.addEventListener('click', (e) => this.checkAnswer(e, questionIndex));
+        });
     }
 
     updateScore() {
@@ -37,7 +41,7 @@ class WordAssociationGame {
     }
 
     populateQuestion() {
-        this.questions.forEach(question => {
+        this.questions.forEach((question, questionIndex) => {
             const questionBox = document.createElement('div');
             questionBox.classList.add('question-box');
 
@@ -54,17 +58,50 @@ class WordAssociationGame {
             const questionButtons = document.createElement('div');
             questionButtons.classList.add('question-buttons');
             questionBox.append(questionButtons);
+            this.$questionButtonsContainer.push(questionButtons);
 
-            question.options.forEach(option => {
+            question.options.forEach((option, optionIndex) => {
                 const questionButton = document.createElement('button');
                 questionButton.classList.add('question-button');
                 questionButton.textContent = option;
+                questionButton.dataset.text = option;
+                questionButton.dataset.index = optionIndex + 1;
 
                 questionButtons.append(questionButton);
             });
 
+            const answerDisplay = document.createElement("div");
+            answerDisplay.classList.add('answer-display');
+            questionBox.append(answerDisplay);
+
             this.$questionDisplay.append(questionBox);
         });
+    }
+
+    checkAnswer(e, questionIndex) {
+        const targetButton = e.target;
+        const option = targetButton.dataset.text;
+        const answerDisplay = targetButton.parentElement.nextElementSibling;
+        if (targetButton.nodeName === 'BUTTON') {
+            if (this.questions[questionIndex].correct === +targetButton.dataset.index) {
+                this.score++;
+                this.addResults(answerDisplay, "Correct!", 'correct');
+                this.updateScore();
+            } else {
+                this.score--;
+                this.addResults(answerDisplay, "Wrong!", 'wrong');
+                this.updateScore();
+            }
+            this.clickedOptions.push(option);
+            targetButton.disabled = this.clickedOptions.includes(option);      
+        } else return;
+    }
+
+    addResults(answerDisplay, answer, className) {
+        answerDisplay.classList.remove('wrong');
+        answerDisplay.classList.remove('correct');
+        answerDisplay.classList.add(className);
+        answerDisplay.textContent = answer;
     }
 
 }
